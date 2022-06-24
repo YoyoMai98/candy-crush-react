@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { width, randomColors } from "../business/Candy"
 
 const createBoard = () => {
@@ -12,11 +12,7 @@ const createBoard = () => {
 }
 
 const useBoard = () => {
-    const [board, setBoard] = useState([])
-
-    useEffect(() => {
-        setBoard(createBoard())
-    }, [])
+    const [board, setBoard] = useState(createBoard())
 
     return [board, setBoard]
 }

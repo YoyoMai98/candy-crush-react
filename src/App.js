@@ -1,15 +1,15 @@
 import useBoard from "./hooks/useBoard";
 import {checkColumnForFour, checkColumnForThree, checkRowForThree, checkRowForFour, updateBoard} from "./business/CheckBoard";
-import { useEffect, useState } from "react";
-import { width } from "./business/Candy";
+import { useEffect, useReducer, useState } from "react";
+import { width, verticalCandyColors, horizonCandyColors } from "./business/Candy";
 import ScoreBoard from "./components/ScoreBoard";
 
 function App() {
-  const [board, setBoard] = useBoard([])
-
   const [score, setScore] = useState(0)
   const [draggedSquare, setDraggedSquare] = useState(null)
   const [replacedSquare, setReplacedSquare] = useState(null)
+
+  const [board, setBoard] = useBoard({setScore})
 
   const onDrop = e => {
     setReplacedSquare(e.target)
@@ -23,8 +23,20 @@ function App() {
     const draggedSquareId = parseInt(draggedSquare.getAttribute('id'))
     const replacedSquareId = parseInt(replacedSquare.getAttribute('id'))
 
-    board[replacedSquareId] = draggedSquare.getAttribute('src')
-    board[draggedSquareId] = replacedSquare.getAttribute('src')
+    const draggedSquareColor = draggedSquare.getAttribute('color')
+    const replacedSquareColor = replacedSquare.getAttribute('color')
+
+    const draggedSquareSrc = draggedSquare.getAttribute('src')
+    const replacedSquareSrc = replacedSquare.getAttribute('src')
+
+    board[replacedSquareId] = {
+      src: draggedSquareSrc,
+      color: draggedSquareColor
+    }
+    board[draggedSquareId] = {
+      src: replacedSquareSrc,
+      color: replacedSquareColor
+    }
 
     const validIndex = [
       draggedSquareId - 1,
@@ -33,18 +45,67 @@ function App() {
       draggedSquareId + width
     ]
 
-    if(replacedSquareId && validIndex.includes(replacedSquareId) && (
-      checkColumnForFour({board, setScore}) ||
-      checkRowForFour({board, setScore}) ||
-      checkColumnForThree({board, setScore}) ||
-      checkRowForThree({board, setScore})
-    )){
+    if(replacedSquareId && validIndex.includes(replacedSquareId)){
+      const checkColumn = checkColumnForFour({board, setScore})
+      const checkRow = checkRowForFour({board, setScore})
+      if(checkColumn !== undefined && checkColumn.isTrue){
+        const color = checkColumn.color
+        const index = horizonCandyColors.color.indexOf(color)
+        if(color === draggedSquareColor){
+          board[replacedSquareId] = {
+            src: horizonCandyColors.src[index],
+            color: color
+          }
+        }else{
+          board[draggedSquareId] = {
+            src: horizonCandyColors.src[index],
+            color: color
+          }
+        }
+      }
+
+      if(checkRow !== undefined && checkRow.isTrue){
+        const color = checkRow.color
+        const index = verticalCandyColors.color.indexOf(color)
+        if(color === draggedSquareColor){
+          board[replacedSquareId] = {
+            src: verticalCandyColors.src[index],
+            color: color
+          }
+        }else{
+          board[draggedSquareId] = {
+            src: verticalCandyColors.src[index],
+            color: color
+          }
+        }
+      }
+
+      if(
+          checkColumnForThree({board, setScore}) ||
+          checkRowForThree({board, setScore})
+        ){
+          board[replacedSquareId] = {
+            src: draggedSquareSrc,
+            color: draggedSquareColor
+          }
+          board[draggedSquareId] = {
+            src: replacedSquareSrc,
+            color: replacedSquareColor
+          }
+        }
       setDraggedSquare(null)
       setReplacedSquare(null)
     }else{
-      board[replacedSquareId] = replacedSquare.getAttribute('src')
-      board[draggedSquareId] = draggedSquare.getAttribute('src')
+      board[replacedSquareId] = {
+        src: replacedSquareSrc,
+        color: replacedSquareColor
+      }
+      board[draggedSquareId] = {
+          src: draggedSquareSrc,
+          color: draggedSquareColor
+        }
       setBoard([...board])
+
     }
   }
 
@@ -61,12 +122,8 @@ function App() {
     return () => clearInterval(timer)
 
   }, [
-    checkColumnForFour,
-    checkRowForFour,
-    checkColumnForThree,
-    checkRowForThree,
-    updateBoard,
     setScore,
+    setBoard,
     board
   ])
 
@@ -75,7 +132,8 @@ function App() {
       <div className="game">
         {board.map((candyColor, index) => (
           <img
-            src={candyColor}
+            src={candyColor.src}
+            color={candyColor.color}
             alt={candyColor} 
             key={index}
             id={index}
