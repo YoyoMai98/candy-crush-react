@@ -13,9 +13,16 @@
   display: flex;
   flex-wrap: wrap;
   margin: 5vw auto;
+  position: relative;
 }
 
 .game img {
   width: 70px;
   height: 70px;
+}
+
+aside {
+  position: absolute;
+  top: 0;
+  right: 14vw;
 }

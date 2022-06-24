@@ -2,16 +2,12 @@ import useBoard from "./hooks/useBoard";
 import {checkColumnForFour, checkColumnForThree, checkRowForThree, checkRowForFour, updateBoard} from "./business/CheckBoard";
 import { useEffect, useState } from "react";
 import { width } from "./business/Candy";
-import useScore from "./hooks/useScore";
 import ScoreBoard from "./components/ScoreBoard";
 
 function App() {
   const [board, setBoard] = useBoard([])
-  const [score, setScore, scoreDisplay] = useScore({
-    board,
-    checkColumnForFour, checkColumnForThree, checkRowForThree, checkRowForFour
-  })
-  
+
+  const [score, setScore] = useState(0)
   const [draggedSquare, setDraggedSquare] = useState(null)
   const [replacedSquare, setReplacedSquare] = useState(null)
 
@@ -38,10 +34,10 @@ function App() {
     ]
 
     if(replacedSquareId && validIndex.includes(replacedSquareId) && (
-      checkColumnForFour({board}) ||
-      checkRowForFour({board}) ||
-      checkColumnForThree({board}) ||
-      checkRowForThree({board})
+      checkColumnForFour({board, setScore}) ||
+      checkRowForFour({board, setScore}) ||
+      checkColumnForThree({board, setScore}) ||
+      checkRowForThree({board, setScore})
     )){
       setDraggedSquare(null)
       setReplacedSquare(null)
@@ -54,18 +50,25 @@ function App() {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      checkColumnForFour({board})
-      checkRowForFour({board})
-      checkColumnForThree({board})
-      checkRowForThree({board})
+      checkColumnForFour({board, setScore})
+      checkRowForFour({board, setScore})
+      checkColumnForThree({board, setScore})
+      checkRowForThree({board, setScore})
       updateBoard({board})
       setBoard([...board])
-      scoreDisplay()
     }, 100)
 
     return () => clearInterval(timer)
 
-  }, [checkColumnForFour, checkRowForFour, checkColumnForThree, checkRowForThree, updateBoard, board])
+  }, [
+    checkColumnForFour,
+    checkRowForFour,
+    checkColumnForThree,
+    checkRowForThree,
+    updateBoard,
+    setScore,
+    board
+  ])
 
   return (
     <div className="app">
@@ -86,7 +89,9 @@ function App() {
           />
         ))}
       </div>
-      <ScoreBoard score={score} />
+      <aside>
+          <ScoreBoard score={score} />
+      </aside>
     </div>
   );
 }
