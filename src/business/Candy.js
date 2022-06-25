@@ -28,7 +28,8 @@ export const candyColors = {
     redCandy,
     greenCandy
     ],
-    color: ["blue", "orange", "purple", "yellow", "red", "green"]
+    color: ["blue", "orange", "purple", "yellow", "red", "green"],
+    type: "normal"
 }
 
 export const verticalCandyColors = {
@@ -40,7 +41,8 @@ export const verticalCandyColors = {
     verredCandy,
     vergreenCandy
     ],
-    color: ["blue", "orange", "purple", "yellow", "red", "green"]
+    color: ["blue", "orange", "purple", "yellow", "red", "green"],
+    type: "vertical"
 }
 
 export const horizonCandyColors = {
@@ -52,12 +54,16 @@ export const horizonCandyColors = {
     horredCandy,
     horgreenCandy
     ],
-    color: ["blue", "orange", "purple", "yellow", "red", "green"]
+    color: ["blue", "orange", "purple", "yellow", "red", "green"],
+    type: "horizon"
 }
+
+export const specialTypes = ["horizon", "vertical"]
 
 export const randomColors = () => {
     const randomIndex = Math.floor(Math.random() * candyColors.src.length)
     const src = candyColors.src[randomIndex]
     const color = candyColors.color[randomIndex]
-    return {src, color}
+    const type = "normal"
+    return {src, color, type}
 }
