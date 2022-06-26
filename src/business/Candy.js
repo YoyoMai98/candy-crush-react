@@ -80,7 +80,8 @@ export const wrappedCandyColors = {
     type: "wrapped"
 }
 
-export const specialTypes = ["horizon", "vertical", "wrapped"]
+export const specialTypes = ["wrapped"]
+export const strippedTypes = ["horizon", "vertical"]
 
 export const randomColors = () => {
     const randomIndex = Math.floor(Math.random() * candyColors.src.length)

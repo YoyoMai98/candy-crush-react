@@ -38,6 +38,7 @@ h2 {
   cursor: grab;
   cursor: -moz-grab;
   cursor: -webkit-grab;
+  z-index: 10;
 }
 
 .game img:hover{

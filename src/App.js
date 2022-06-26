@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import useBoard from "./hooks/useBoard";
 
 import {checkColumnForFour, checkColumnForThree, checkRowForThree, checkRowForFour, updateBoard,
-        checkHorizonColor, checkVertizonColor, checkSpecialColor
+        checkHorizonColor, checkVerticalColor, checkSpecialColor
 } from "./business/CheckBoard";
-import { checkColorForSix } from "./business/CheckWrapperCandy"
+import { checkColorForSix, checkWrappedCandy } from "./business/CheckWrapperCandy"
 import { width, verticalCandyColors, horizonCandyColors, wrappedCandyColors } from "./business/Candy";
 import ScoreBoard from "./components/ScoreBoard";
 
@@ -81,7 +81,9 @@ function App() {
             checkHorizonColor({indexArr: checkColumn.indexArr, board, setScore})
           }else if(draggedSquareType === "vertical" || replacedSquareType === "vertical"
           ){
-            checkVertizonColor({indexArr: checkColumn.indexArr, board, setScore})
+            checkVerticalColor({indexArr: checkColumn.indexArr, board, setScore})
+          }else if(draggedSquareType === "wrapped" || replacedSquareType === "wrapped"){
+            checkWrappedCandy({board, setScore, indexArr: checkColumn.indexArr})
           }
 console.log("checkColumn");
         const color = checkColumn.color
@@ -110,7 +112,9 @@ console.log("checkColumn");
           checkHorizonColor({indexArr: checkRow.indexArr, board, setScore})
         }else if( draggedSquareType === "vertical" || replacedSquareType === "vertical"
         ){
-          checkVertizonColor({indexArr: checkRow.indexArr, board, setScore})
+          checkVerticalColor({indexArr: checkRow.indexArr, board, setScore})
+        }else if(draggedSquareType === "wrapped" || replacedSquareType === "wrapped"){
+          checkWrappedCandy({board, setScore, indexArr: checkRow.indexArr})
         }
 console.log("checkRow");
         const color = checkRow.color
