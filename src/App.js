@@ -1,9 +1,11 @@
+import { useEffect, useState } from "react";
 import useBoard from "./hooks/useBoard";
+
 import {checkColumnForFour, checkColumnForThree, checkRowForThree, checkRowForFour, updateBoard,
         checkHorizonColor, checkVertizonColor, checkSpecialColor
 } from "./business/CheckBoard";
-import { useEffect, useState } from "react";
-import { width, verticalCandyColors, horizonCandyColors } from "./business/Candy";
+import { checkColorForSix } from "./business/CheckWrapperCandy"
+import { width, verticalCandyColors, horizonCandyColors, wrappedCandyColors } from "./business/Candy";
 import ScoreBoard from "./components/ScoreBoard";
 
 function App() {
@@ -15,6 +17,7 @@ function App() {
   const [board, setBoard] = useBoard({setScore})
 
   const onDrop = e => {
+    e.preventDefault()
     setReplacedSquare(e.target)
   }
 
@@ -35,9 +38,6 @@ function App() {
 
     const draggedSquareType = draggedSquare.getAttribute('type')
     const replacedSquareType = replacedSquare.getAttribute('type')
-
-    console.log("drag"+draggedSquareType);
-    console.log("replace"+replacedSquareType);
 
     board[replacedSquareId] = {
       src: draggedSquareSrc,
@@ -60,30 +60,28 @@ function App() {
     if(replacedSquareId && validIndex.includes(replacedSquareId)){
       const checkColumn = checkColumnForFour({board, setScore, isDragged})
       const checkRow = checkRowForFour({board, setScore, isDragged})
+      const checkWrap = checkColorForSix({board, setScore, isDragged})
       const checkColThree = checkColumnForThree({board, setScore, isDragged})
       const checkRowThree = checkRowForThree({board, setScore, isDragged})
+
       isDragged = false
+
       if(checkSpecialColor({
         firstSquareType: draggedSquareType, secondSquareType: replacedSquareType,
         secondSquareId: replacedSquareId, board, setScore
       })){
-        console.log("checkSpecialColor");
         setDraggedSquare(null)
         setReplacedSquare(null)
         return
       }
 
       else if(checkColumn !== undefined && checkColumn.isTrue){
-        console.log(console.log(checkColumn.indexArr))
-        console.log(board);
         if(draggedSquareType === "horizon" || replacedSquareType === "horizon"
           ){
-            console.log("---checkHor for column--");
-              checkHorizonColor({indexArr: checkColumn.indexArr, board, setScore})
+            checkHorizonColor({indexArr: checkColumn.indexArr, board, setScore})
           }else if(draggedSquareType === "vertical" || replacedSquareType === "vertical"
           ){
-            console.log("---checkVer for column");
-              checkVertizonColor({indexArr: checkColumn.indexArr, board, setScore})
+            checkVertizonColor({indexArr: checkColumn.indexArr, board, setScore})
           }
 console.log("checkColumn");
         const color = checkColumn.color
@@ -107,17 +105,13 @@ console.log("checkColumn");
       }
       
       else if(checkRow !== undefined && checkRow.isTrue){
-        console.log(checkRow.indexArr);
-        console.log(board);
         if(draggedSquareType === "horizon" || replacedSquareType === "horizon"
         ){
-          console.log("---checkHor for row--");
           checkHorizonColor({indexArr: checkRow.indexArr, board, setScore})
-          }else if( draggedSquareType === "vertical" || replacedSquareType === "vertical"
-          ){
-            console.log("---checkVer for row--");
+        }else if( draggedSquareType === "vertical" || replacedSquareType === "vertical"
+        ){
           checkVertizonColor({indexArr: checkRow.indexArr, board, setScore})
-          }
+        }
 console.log("checkRow");
         const color = checkRow.color
         const index = verticalCandyColors.color.indexOf(color)
@@ -139,9 +133,32 @@ console.log("checkRow");
         return
       }
 
+      else if(checkWrap !== undefined && checkWrap.isTrue){
+        console.log("checkWrap");
+        const color = checkWrap.color
+        const index = wrappedCandyColors.color.indexOf(color)
+        if(color === draggedSquareColor){
+          board[replacedSquareId] = {
+            src: wrappedCandyColors.src[index],
+            color: color,
+            type: "wrapped"
+          }
+        }else{
+          board[draggedSquareId] = {
+            src: wrappedCandyColors.src[index],
+            color: color,
+            type: "wrapped"
+          }
+        }
+        setDraggedSquare(null)
+        setReplacedSquare(null)
+        return
+      }
+
       else if((checkColThree !== undefined && checkColThree.isTrue) ||
               (checkRowThree !== undefined && checkRowThree.isTrue)
         ){
+          console.log(true);
           setDraggedSquare(null)
           setReplacedSquare(null)
           return
@@ -181,6 +198,7 @@ console.log("checkRow");
     const timer = setInterval(() => {
       checkColumnForFour({board, setScore, isDragged})
       checkRowForFour({board, setScore, isDragged})
+      checkColorForSix({board, setScore, isDragged})
       checkColumnForThree({board, setScore})
       checkRowForThree({board, setScore})
       updateBoard({board})
@@ -198,6 +216,7 @@ console.log("checkRow");
 
   return (
     <div className="app">
+    <h2>Candy Crush</h2>
       <div className="game">
         {board.map((candyColor, index) => (
           <img

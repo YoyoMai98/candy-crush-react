@@ -4,18 +4,27 @@ import orangeCandy from '../images/orange-candy.png'
 import purpleCandy from '../images/purple-candy.png'
 import redCandy from '../images/red-candy.png'
 import yellowCandy from '../images/yellow-candy.png'
+
 import verblueCandy from '../images/speical candy/vertical-blue-candy.png'
 import verorangeCandy from '../images/speical candy/vertical-orange-candy.png'
 import verpurpleCandy from '../images/speical candy/vertical-purple-candy.png'
 import verredCandy from '../images/speical candy/vertical-red-candy.png'
 import vergreenCandy from '../images/speical candy/vertical-green-candy.png'
 import veryellowCandy from '../images/speical candy/vertical-yellow-candy.png'
+
 import horblueCandy from '../images/speical candy/horizon-blue-candy.png'
 import hororangeCandy from '../images/speical candy/horizon-orange-candy.png'
 import horpurpleCandy from '../images/speical candy/horizon-purple-candy.png'
 import horredCandy from '../images/speical candy/horizon-red-candy.png'
 import horgreenCandy from '../images/speical candy/horizon-green-candy.png'
 import horyellowCandy from '../images/speical candy/horizon-yellow-candy.png'
+
+import wrapblueCandy from '../images/speical candy/wrapped-blue-candy.png'
+import wraporangeCandy from '../images/speical candy/wrapped-orange-candy.png'
+import wrappurpleCandy from '../images/speical candy/wrapped-purple-candy.png'
+import wrapredCandy from '../images/speical candy/wrapped-red-candy.png'
+import wrapgreenCandy from '../images/speical candy/wrapped-green-candy.png'
+import wrapyellowCandy from '../images/speical candy/wrapped-yellow-candy.png'
 
 export const width = 8
 
@@ -58,7 +67,20 @@ export const horizonCandyColors = {
     type: "horizon"
 }
 
-export const specialTypes = ["horizon", "vertical"]
+export const wrappedCandyColors = {
+    src:[
+    wrapblueCandy,
+    wraporangeCandy,
+    wrappurpleCandy,
+    wrapyellowCandy,
+    wrapredCandy,
+    wrapgreenCandy
+    ],
+    color: ["blue", "orange", "purple", "yellow", "red", "green"],
+    type: "wrapped"
+}
+
+export const specialTypes = ["horizon", "vertical", "wrapped"]
 
 export const randomColors = () => {
     const randomIndex = Math.floor(Math.random() * candyColors.src.length)

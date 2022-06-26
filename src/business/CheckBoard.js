@@ -10,10 +10,8 @@ export const checkColumnForFour = ({board, setScore, isDragged}) => {
 
         if(columnForFour.every(square => board[square].color === chosenColor && !isBlank)) {
             if(columnForFour.some(square => board[square].type === "horizon")){
-              console.log("---checkHor for column--");
               checkHorizonColor({indexArr: columnForFour, board, setScore})
             }else if(columnForFour.some(square => board[square].type === "vertical")){
-              console.log("---checkVer for column");
               checkVertizonColor({indexArr: columnForFour, board, setScore})
             }
 
@@ -26,10 +24,8 @@ export const checkColumnForFour = ({board, setScore, isDragged}) => {
                 board[i + width * 3] = {
                 src: horizonCandyColors.src[index], color: chosenColor, type: "horizon"
                 }
-                console.log(isDragged);
             }
             
-                console.log("checkColumnForFour");
             return {isTrue: true, color: chosenColor, indexArr: columnForFour}
         }
     }
@@ -47,10 +43,8 @@ export const checkRowForFour = ({board, setScore, isDragged}) => {
 
         if(rowForFour.every(square => board[square].color === chosenColor && !isBlank)) {
             if(rowForFour.some(square => board[square].type === "horizon")){
-                console.log("---checkHor for row--");
                 checkHorizonColor({indexArr: rowForFour, board, setScore})
             }else if(rowForFour.some(square => board[square].type === "vertical")){
-                console.log("---checkVer for row--");
                 checkVertizonColor({indexArr: rowForFour, board, setScore})
             }
             
@@ -63,10 +57,8 @@ export const checkRowForFour = ({board, setScore, isDragged}) => {
                 board[i] = {
                 src: verticalCandyColors.src[index], color: chosenColor, type: "vertical"
                 }
-                console.log(isDragged);
             }
             
-                console.log("checkRowForFour");
             return {isTrue: true, color: chosenColor, indexArr: rowForFour}
         }
     }
@@ -127,7 +119,6 @@ export const checkHorizonColor = ({indexArr, board, setScore}) => {
     const interval = indexArr[1] - indexArr[0]
     let horIndex
 
-console.log("ClearHor");
     for(let i = start; i <= end; i = i + interval) {
         if(board[i].type === "horizon") {
             horIndex = i
@@ -138,17 +129,18 @@ console.log("ClearHor");
     for(let j = row * width; j < row * width + width; j++){
         setScore(prev => prev + 60)
         if(board[j].type === "vertical") {
-            horOrVerColor({board, j, isVer: true, isHor: false ,  setScore})
+            horOrVerColor({
+                board,
+                specialColorId: j,
+                isVer: true,
+                isHor: false,
+                setScore
+            })
         }
-        // }else if(j !== horIndex && board[j].type === "horizon"){
-
-        // }
         board[j] = {
             src:blank, color:"blank", type: "blank"
             }
-        console.log(j)
     }
-    console.log("--done--");
 }
 
 export const checkVertizonColor = ({indexArr, board, setScore}) => {
@@ -157,7 +149,6 @@ export const checkVertizonColor = ({indexArr, board, setScore}) => {
     const interval = indexArr[1] - indexArr[0]
     let verIndex
 
-console.log("clearVer");
     for(let i = start; i <= end; i = i + interval) {
         if(board[i].type === "vertical") {
             verIndex = i
@@ -169,37 +160,55 @@ console.log("clearVer");
     for(let j = col; j < width * width; j = j+width){
         setScore(prev => prev + 60)
         if(board[j].type === "horizon"){
-            horOrVerColor({board, j, isVer: false, isHor: true, setScore})
+            horOrVerColor({
+                board,
+                specialColorId: j,
+                isVer: false,
+                isHor: true,
+                setScore
+            })
         }
         board[j] = {
             src:blank, color:"blank", type: "blank"
             }
-            console.log(j)
     }
-    console.log("--done--");
 }
 
-export const horOrVerColor = ({board, j, isVer, isHor, setScore}) => {
+export const horOrVerColor = ({board, specialColorId, isVer, isHor, setScore}) => {
     if(isVer) {
-        console.log(j);
-        const col = j % width
+        const col = specialColorId % width
         for(let i = col; i < width * width; i = i+width){
+            if(board[i].type === "horizon"){
+                horOrVerColor({
+                    board,
+                    specialColorId: i,
+                    isVer: false,
+                    isHor: true,
+                    setScore
+                })
+            }
             setScore(prev => prev + 60)
             board[i] = {
                 src:blank, color:"blank", type: "blank"
                 }
         }
-        console.log("clearver in hor");
     }else if(isHor){
-        console.log(j);
-        const row = parseInt(j / width)
+        const row = parseInt(specialColorId / width)
         for(let i = row * width; i < row * width + width; i++){
+            if(board[i].type === "vertical"){
+                horOrVerColor({
+                    board,
+                    specialColorId: i,
+                    isVer: true,
+                    isHor: false,
+                    setScore
+                })
+            }
             setScore(prev => prev + 60)
             board[i] = {
                 src:blank, color:"blank", type: "blank"
                 }
         }
-        console.log("clearhor in ver");
     }else{
         return
     }
@@ -209,11 +218,19 @@ export const checkSpecialColor = ({
     firstSquareType, secondSquareType, secondSquareId, board, setScore
 }) => {
     if(specialTypes.includes(firstSquareType) && specialTypes.includes(secondSquareType)){
-        console.log("checkSpecialColor-inside");
         const id = secondSquareId
         const row = parseInt(id / width)
         const col = id % width
         for(let i = row * width; i < row * width + width; i++){
+            if(board[i].type === "vertical"){
+                horOrVerColor({
+                    board,
+                    specialColorId: i,
+                    isVer: true,
+                    isHor: false,
+                    setScore
+                })
+            }
             setScore(prev => prev + 60)
             board[i] = {
                 src:blank, color:"blank", type: "blank"
@@ -221,6 +238,15 @@ export const checkSpecialColor = ({
         }
         for(let j = col; j < width * width; j = j+width){
             if(board[j].src !== blank){
+                if(board[j].type === "horizon"){
+                    horOrVerColor({
+                        board,
+                        specialColorId: j,
+                        isVer: false,
+                        isHor: true,
+                        setScore
+                    })
+                }
                 setScore(prev => prev + 60)
                 board[j] = {
                     src:blank, color:"blank", type: "blank"
