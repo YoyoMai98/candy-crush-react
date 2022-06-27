@@ -1,7 +1,8 @@
-import { randomColors, width, specialTypes, strippedTypes } from "./Candy"
+import { randomColors, width } from "./Candy"
 import blank from '../images/blank.png'
 import { horizonCandyColors, verticalCandyColors } from "./Candy"
-import { checkWrappedCandy } from "./CheckWrapperCandy"
+import { checkHorizonColor, checkVerticalColor } from "./CheckStrippedCandy"
+import { checkWrappedCandy } from "./CheckWrappedCandy"
 
 export const checkColumnForFour = ({board, setScore, isDragged}) => {
     for(let i = 0; i < 5 * width; i++) {
@@ -123,75 +124,6 @@ export const checkRowForThree = ({board, setScore}) => {
     }
 }
 
-export const checkHorizonColor = ({indexArr, board, setScore}) => {
-    let horIndex
-
-    // for(let i = start; i <= end; i = i + interval) {
-    //     if(board[i].type === "horizon") {
-    //         horIndex = i
-    //     }
-    // }
-    indexArr.forEach(square => {
-        if(board[square].type === "horizon") {
-            horIndex = square
-        }
-    })
-
-    const row = parseInt(horIndex / width)
-
-    for(let j = row * width; j < row * width + width; j++){
-        setScore(prev => prev + 60)
-        if(board[j].type === "vertical") {
-            // horOrVerColor({
-            //     board,
-            //     specialColorId: j,
-            //     isVer: true,
-            //     isHor: false,
-            //     setScore
-            // })
-            console.log("find-vertical");
-            checkVerticalColor({indexArr: [j], board, setScore})
-        }
-        board[j] = {
-            src:blank, color:"blank", type: "blank"
-            }
-    }
-}
-
-export const checkVerticalColor = ({indexArr, board, setScore}) => {
-    let verIndex
-
-    indexArr.forEach(square => {
-        if(board[square].type === "vertical") {
-            verIndex = square
-        }
-    })
-
-    const col = verIndex % width
-
-    for(let j = col; j < width * width; j = j+width){
-        setScore(prev => prev + 60)
-        if(board[j].type === "horizon"){
-            // horOrVerColor({
-            //     board,
-            //     specialColorId: j,
-            //     isVer: false,
-            //     isHor: true,
-            //     setScore
-            // })
-            console.log("find-horizon");
-            checkHorizonColor({indexArr: [j], board, setScore})
-        }
-        if(board[j].type === "wrapped"){
-            console.log("find-wrapped");
-            checkWrappedCandy({board, setScore, indexArr: [j]})
-        }
-        board[j] = {
-            src:blank, color:"blank", type: "blank"
-            }
-    }
-}
-
 // export const horOrVerColor = ({board, specialColorId, isVer, isHor, setScore}) => {
 //     if(isVer) {
 //         const col = specialColorId % width
@@ -231,123 +163,6 @@ export const checkVerticalColor = ({indexArr, board, setScore}) => {
 //         return
 //     }
 // }
-
-export const checkSpecialColor = ({
-  firstSquareType, secondSquareType, secondSquareId, board, setScore
-}) => {
-  if(strippedTypes.includes(firstSquareType) && strippedTypes.includes(secondSquareType)){
-    const id = secondSquareId
-    const row = parseInt(id / width)
-    const col = id % width
-    for(let i = row * width; i < row * width + width; i++){
-      if(board[i].type === "vertical"){
-                // horOrVerColor({
-                //     board,
-                //     specialColorId: i,
-                //     isVer: true,
-                //     isHor: false,
-                //     setScore
-                // })
-        checkVerticalColor({indexArr: [i], board, setScore})
-      }
-      setScore(prev => prev + 60)
-      board[i] = {
-        src:blank, color:"blank", type: "blank"
-      }
-    }
-    for(let j = col; j < width * width; j = j+width){
-      if(board[j].src !== blank){
-        if(board[j].type === "horizon"){
-                    // horOrVerColor({
-                    //     board,
-                    //     specialColorId: j,
-                    //     isVer: false,
-                    //     isHor: true,
-                    //     setScore
-                    // })
-          checkHorizonColor({indexArr: [j], board, setScore})
-        }
-        setScore(prev => prev + 60)
-        board[j] = {
-          src:blank, color:"blank", type: "blank"
-        }
-      }
-    }
-    return true
-  }
-  
-  else if((strippedTypes.includes(firstSquareType) && secondSquareType === "wrapped") ||
-    (strippedTypes.includes(secondSquareType) && firstSquareType === "wrapped")
-  ){
-    console.log("wrapped+stripped");
-    const id = secondSquareId
-    const row = parseInt(id / width)
-    const col = id % width
-
-    let coefficientForRow
-    let countForRow
-    let coefficientForCol
-    let countForColumn
-
-    if(row === 0){
-      coefficientForRow = 0
-      countForRow = 2
-    }else if(row === width - 1){
-      coefficientForRow = row - 1
-      countForRow = 2
-    }else{
-      coefficientForRow = row - 1
-      countForRow = 3
-    }
-
-    if(col === 0){
-      coefficientForCol = 0
-      countForColumn = 2
-    }else if(col === width - 1){
-      coefficientForCol = col - 1
-      countForColumn = 2
-    }else{
-      coefficientForCol = col - 1
-      countForColumn = 3
-    }
-
-    for(let i = coefficientForRow * width; i < (coefficientForRow + countForRow) * width; i++){
-      if(board[i].type === "vertical"){
-        if(i % width !== coefficientForCol && i % width !== coefficientForCol+1){
-          if((countForColumn === 2) ||
-              (countForColumn === 3 && i % width !== coefficientForCol+1)
-          ){
-            checkVerticalColor({indexArr: [i], board, setScore})
-          }
-        }
-      }
-      setScore(prev => prev + 60)
-      board[i] = {
-        src:blank, color:"blank", type: "blank"
-      }
-    }
-    for(let j = coefficientForCol; j < width * width; j = j+width){
-      for(let k = j; k < j+countForColumn; k++){
-        if(board[k].src !== blank){
-          if(board[k].type === "horizon"){
-            if(parseInt(k/width) !== coefficientForRow && parseInt(k/width) !== coefficientForRow+1){
-              if(countForRow === 2||
-                (countForRow === 3 && parseInt(k/width) !== coefficientForRow+2)
-              ){
-                checkHorizonColor({indexArr: [k], board, setScore})
-              }
-            }
-          }
-          setScore(prev => prev + 60)
-          board[k] = {
-            src:blank, color:"blank", type: "blank"
-          }
-        }
-      }
-    }
-    return true
-  }
-}
 
 export const updateBoard = ({board}) => {
     for(let i = 0; i < width * 7; i++){

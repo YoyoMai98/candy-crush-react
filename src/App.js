@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import useBoard from "./hooks/useBoard";
 
-import {checkColumnForFour, checkColumnForThree, checkRowForThree, checkRowForFour, updateBoard,
-        checkHorizonColor, checkVerticalColor, checkSpecialColor
-} from "./business/CheckBoard";
-import { checkColorForSix, checkWrappedCandy } from "./business/CheckWrapperCandy"
+import useBoard from "./hooks/useBoard";
+import useTime from "./hooks/useTime";
+
+import {checkColumnForFour, checkColumnForThree, checkRowForThree, checkRowForFour, updateBoard} from "./business/CheckBoard";
+import { checkHorizonColor, checkVerticalColor, checkSpecialColor } from "./business/CheckStrippedCandy"
+import { checkColorForSix, checkWrappedCandy } from "./business/CheckWrappedCandy"
 import { width, verticalCandyColors, horizonCandyColors, wrappedCandyColors } from "./business/Candy";
 import ScoreBoard from "./components/ScoreBoard";
 
@@ -12,9 +13,11 @@ function App() {
   const [score, setScore] = useState(0)
   const [draggedSquare, setDraggedSquare] = useState(null)
   const [replacedSquare, setReplacedSquare] = useState(null)
+
   let isDragged = false
 
   const [board, setBoard] = useBoard({setScore})
+  const [refreshTime, resumeTime, pauseTime] = useTime()
 
   const onDrop = e => {
     e.preventDefault()
@@ -63,15 +66,23 @@ function App() {
       const checkWrap = checkColorForSix({board, setScore, isDragged})
       const checkColThree = checkColumnForThree({board, setScore, isDragged})
       const checkRowThree = checkRowForThree({board, setScore, isDragged})
-
+console.log("--checkColumnForFour--");
+console.log(checkColumn);
+console.log("--checkRowForFour--");
+console.log(checkRow);
+console.log("--checkColorForSix--");
+console.log(checkWrap);
       isDragged = false
 
       if(checkSpecialColor({
         firstSquareType: draggedSquareType, secondSquareType: replacedSquareType,
-        secondSquareId: replacedSquareId, board, setScore
+        firstSquareId: draggedSquareId, secondSquareId: replacedSquareId,
+        board, setScore, pauseTime
       })){
+        console.log("checkSpecialColor");
         setDraggedSquare(null)
         setReplacedSquare(null)
+        resumeTime()
         return
       }
 
@@ -207,7 +218,7 @@ console.log("checkRow");
       checkRowForThree({board, setScore})
       updateBoard({board})
       setBoard([...board])
-    }, 100)
+    }, refreshTime)
 
     return () => clearInterval(timer)
 
