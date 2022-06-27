@@ -24,10 +24,20 @@ export const checkColorForSix = ({board, setScore, isDragged}) => {
       if(arr.every(square => board[square].color === chosenColor && !isBlank)){
         console.log("loop in checkWrap");
         let row = 0
+        let col = 0
         let preserverRow = -1
         let count = 0
+        let minCol = 0
+        let maxCol = 0
         for(let k = 0; k < arr.length; k++) {
           row = parseInt(arr[k] / width)
+          col = arr[k] % width
+          if(k === 0){
+            minCol = col
+          }else{
+            minCol = Math.min(minCol, col)
+          }
+          maxCol = Math.max(maxCol, col)
           if(preserverRow !== row){
             count++
           }
@@ -38,7 +48,16 @@ export const checkColorForSix = ({board, setScore, isDragged}) => {
           }
           preserverRow = row
         }
+        console.log(arr);
+        console.log(minCol);
+        console.log(maxCol);
+        if((maxCol - minCol) !== 2){
+          console.log("maxCol - minCol: " + (maxCol - minCol));
+          isContainedWrapped = false
+          break
+        }
         if(count === 3){
+          console.log("maxCol - minCol: " + (maxCol - minCol));
           console.log("count = 3");
           isContainedWrapped = true
           arrForSix = arr
@@ -54,7 +73,7 @@ export const checkColorForSix = ({board, setScore, isDragged}) => {
       }else if(arrForSix.some(square => board[square].type === "vertical")){
         checkVerticalColor({indexArr: arrForSix, board, setScore})
       }else if(arrForSix.some(square => board[square].type === "wrapped")){
-        checkWrappedCandy({indexArr: arrForSix, board, setScore})
+        checkWrappedCandy({indexArr: arrForSix, board, setScore, strippedIndex: null})
       }
       const index = wrappedCandyColors.color.indexOf(chosenColor)
       setScore(prev => prev + 200)
@@ -72,7 +91,7 @@ export const checkColorForSix = ({board, setScore, isDragged}) => {
   }
 }
 
-export const checkWrappedCandy = ({board, setScore, indexArr}) => {
+export const checkWrappedCandy = ({board, setScore, indexArr, strippedIndex}) => {
   let wrapIndex
   indexArr.forEach(square => {
     if(board[square].type === "wrapped"){
@@ -109,17 +128,29 @@ export const checkWrappedCandy = ({board, setScore, indexArr}) => {
   }
 
   console.log(arr);
+  console.log(strippedIndex);
   for(let i = 0; i < arr.length; i++){
-    if(board[arr[i]].type === "vertical") {
+    if(board[arr[i]].type === "vertical" && 
+      (strippedIndex === null || (strippedIndex !== null && arr[i] !== strippedIndex))
+    ) {
       console.log("find-vertical in wrap");
       checkVerticalColor({indexArr: [arr[i]], board, setScore})
-    }else if(board[arr[i]].type === "horizon") {
+      continue
+    }else if(board[arr[i]].type === "horizon" && 
+      (strippedIndex === null || (strippedIndex !== null && arr[i] !== strippedIndex))
+    ) {
       console.log("find-horizon in wrap")
       checkHorizonColor({indexArr: [arr[i]], board, setScore})
-    }
-    setScore(prev => prev + 60)
-    board[arr[i]] = {
-      src: blank, color: "blank", type: "blank"
+      continue
+    }else if(arr[i] !== wrapIndex && board[arr[i]].type === "wrapped"){
+      console.log("find-wrapped in wrap");
+      checkWrappedCandy({indexArr: [arr[i]], board, setScore, strippedIndex: null})
+      continue
+    }else if(board[i].src !== blank){
+      setScore(prev => prev + 60)
+      board[arr[i]] = {
+        src: blank, color: "blank", type: "blank"
+      }
     }
   }
   console.log("--clear wrapped candy--");

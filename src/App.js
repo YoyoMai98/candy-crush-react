@@ -87,15 +87,13 @@ console.log(checkWrap);
       }
 
       else if(checkColumn !== undefined && checkColumn.isTrue){
-        if(draggedSquareType === "horizon" || replacedSquareType === "horizon"
-          ){
-            checkHorizonColor({indexArr: checkColumn.indexArr, board, setScore})
-          }else if(draggedSquareType === "vertical" || replacedSquareType === "vertical"
-          ){
-            checkVerticalColor({indexArr: checkColumn.indexArr, board, setScore})
-          }else if(draggedSquareType === "wrapped" || replacedSquareType === "wrapped"){
-            checkWrappedCandy({board, setScore, indexArr: checkColumn.indexArr})
-          }
+        if(draggedSquareType === "horizon" || replacedSquareType === "horizon"){
+          checkHorizonColor({indexArr: checkColumn.indexArr, board, setScore})
+        }else if(draggedSquareType === "vertical" || replacedSquareType === "vertical"){
+          checkVerticalColor({indexArr: checkColumn.indexArr, board, setScore})
+        }else if(draggedSquareType === "wrapped" || replacedSquareType === "wrapped"){
+          checkWrappedCandy({board, setScore, indexArr: checkColumn.indexArr})
+        }
 console.log("checkColumn");
         const color = checkColumn.color
         const index = horizonCandyColors.color.indexOf(color)
@@ -118,11 +116,9 @@ console.log("checkColumn");
       }
       
       else if(checkRow !== undefined && checkRow.isTrue){
-        if(draggedSquareType === "horizon" || replacedSquareType === "horizon"
-        ){
+        if(draggedSquareType === "horizon" || replacedSquareType === "horizon"){
           checkHorizonColor({indexArr: checkRow.indexArr, board, setScore})
-        }else if( draggedSquareType === "vertical" || replacedSquareType === "vertical"
-        ){
+        }else if( draggedSquareType === "vertical" || replacedSquareType === "vertical"){
           checkVerticalColor({indexArr: checkRow.indexArr, board, setScore})
         }else if(draggedSquareType === "wrapped" || replacedSquareType === "wrapped"){
           checkWrappedCandy({board, setScore, indexArr: checkRow.indexArr})

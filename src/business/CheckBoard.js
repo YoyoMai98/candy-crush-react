@@ -14,9 +14,9 @@ export const checkColumnForFour = ({board, setScore, isDragged}) => {
             if(columnForFour.some(square => board[square].type === "horizon")){
               checkHorizonColor({indexArr: columnForFour, board, setScore})
             }else if(columnForFour.some(square => board[square].type === "vertical")){
-                checkVerticalColor({indexArr: columnForFour, board, setScore})
+              checkVerticalColor({indexArr: columnForFour, board, setScore})
             }else if(columnForFour.some(square => board[square].type === "wrapped")){
-                checkWrappedCandy({board, setScore, indexArr: columnForFour})
+              checkWrappedCandy({board, setScore, indexArr: columnForFour, strippedIndex: null})
             }
 
             const index = horizonCandyColors.color.indexOf(chosenColor)
@@ -51,7 +51,7 @@ export const checkRowForFour = ({board, setScore, isDragged}) => {
             }else if(rowForFour.some(square => board[square].type === "vertical")){
                 checkVerticalColor({indexArr: rowForFour, board, setScore})
             }else if(rowForFour.some(square => board[square].type === "wrapped")){
-                checkWrappedCandy({board, setScore, indexArr: rowForFour})
+                checkWrappedCandy({board, setScore, indexArr: rowForFour, strippedIndex: null})
             }
             
             const index = verticalCandyColors.color.indexOf(chosenColor)
@@ -82,7 +82,7 @@ export const checkColumnForThree = ({board, setScore}) => {
             }else if(columnForThree.some(square => board[square].type === "vertical")){
                 checkVerticalColor({indexArr: columnForThree, board, setScore})
             }else if(columnForThree.some(square => board[square].type === "wrapped")){
-                checkWrappedCandy({indexArr: columnForThree, board, setScore})
+                checkWrappedCandy({indexArr: columnForThree, board, setScore, strippedIndex: null})
             }
             else {
                 setScore(prev => prev + 60)
@@ -111,7 +111,7 @@ export const checkRowForThree = ({board, setScore}) => {
             }else if(rowForThree.some(square => board[square].type === "vertical")){
                 checkVerticalColor({indexArr: rowForThree, board, setScore})
             }else if(rowForThree.some(square => board[square].type === "wrapped")){
-                checkWrappedCandy({indexArr: rowForThree, board, setScore})
+                checkWrappedCandy({indexArr: rowForThree, board, setScore, strippedIndex: null})
             }
             else{
                 setScore(prev => prev + 60)

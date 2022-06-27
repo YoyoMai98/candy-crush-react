@@ -3,14 +3,15 @@ import { checkWrappedCandy } from "./CheckWrappedCandy"
 import blank from '../images/blank.png'
 
 export const checkHorizonColor = ({indexArr, board, setScore}) => {
-    // let horIndexArr
-    let rowArr = []
+    // let rowArr = []
+    let horArr = []
     let verArr = []
+    let preservedRow
 
     indexArr.forEach(square => {
         if(board[square].type === "horizon") {
-            // horIndexArr.push(square)
-          rowArr.push(parseInt(square / width))
+          horArr.push(square)
+          // rowArr.push(parseInt(square / width))
         }else if(board[square].type === "vertical"){
           verArr.push(square)
         }
@@ -19,50 +20,78 @@ export const checkHorizonColor = ({indexArr, board, setScore}) => {
     if(verArr.length !== 0){
       checkVerticalColor({indexArr: verArr, board, setScore})
     }
-    if(rowArr.length === 0){
+    if(horArr.length === 0){
       return
     }
 
     console.log(indexArr);
-    console.log("rowArr: "+rowArr);
-    rowArr.forEach(row => {
+    console.log("horArr: "+horArr);
+    for(let id = 0; id < horArr.length; id++){
+      const square = horArr[id]
+      const row = parseInt(square / width)
+
+      if(id === 0){
+        preservedRow = row
+      }else if(preservedRow === row) continue
+
       for(let j = row * width; j < row * width + width; j++){
-        setScore(prev => prev + 60)
         if(board[j].type === "vertical") {
-            // horOrVerColor({
-            //     board,
-            //     specialColorId: j,
-            //     isVer: true,
-            //     isHor: false,
-            //     setScore
-            // })
             console.log("find-vertical");
             checkVerticalColor({indexArr: [j], board, setScore})
+            continue
         }
         // if(parseInt(j / width) !== row && board[j].type === "horizon"){
         //   checkHorizonColor({indexArr: [j], board, setScore})
         // }
         if(board[j].type === "wrapped"){
           console.log("find-wrapped in horizon");
-          checkWrappedCandy({board, setScore, indexArr: [j]})
+          checkWrappedCandy({board, setScore, indexArr: [j], strippedIndex: square})
+          continue
         }
-        board[j] = {
+        if(board[j].src !== blank){
+          setScore(prev => prev + 60)
+          board[j] = {
             src:blank, color:"blank", type: "blank"
             }
+        }
       }
-    })
+    }
+    // rowArr.forEach(row => {
+    //   for(let j = row * width; j < row * width + width; j++){
+    //     if(board[j].type === "vertical") {
+    //         console.log("find-vertical");
+    //         checkVerticalColor({indexArr: [j], board, setScore})
+    //         continue
+    //     }
+    //     // if(parseInt(j / width) !== row && board[j].type === "horizon"){
+    //     //   checkHorizonColor({indexArr: [j], board, setScore})
+    //     // }
+    //     if(board[j].type === "wrapped"){
+    //       console.log("find-wrapped in horizon");
+    //       checkWrappedCandy({board, setScore, indexArr: [j], strippedIndex: j})
+    //       continue
+    //     }
+    //     if(board[j].src !== blank){
+    //       setScore(prev => prev + 60)
+    //       board[j] = {
+    //         src:blank, color:"blank", type: "blank"
+    //         }
+    //     }
+    //   }
+    // })
     console.log("clear horizontal");
 }
 
 export const checkVerticalColor = ({indexArr, board, setScore}) => {
-    // let verIndex
-    let colArr = []
+    // let colArr = []
     let horArr = []
+    let verArr = []
+    let preservedCol
 
     indexArr.forEach(square => {
         if(board[square].type === "vertical") {
-            // verIndex = square
-          colArr.push(square % width)
+          verArr.push(square)
+          // colArr.push(square % width)
         }else if(board[square].type === "horizon"){
           horArr.push(square)
         }
@@ -71,25 +100,23 @@ export const checkVerticalColor = ({indexArr, board, setScore}) => {
     if(horArr.length !== 0){
       checkHorizonColor({indexArr: horArr, board, setScore})
     }
-    if(colArr.length === 0){
+    if(verArr.length === 0){
       return
     }
 
-console.log(indexArr);
-console.log("colArr: "+ colArr);
-    colArr.forEach(col => {
+    for(let id = 0; id < verArr.length; id++){
+      const square = verArr[id]
+      const col = square % width
+      
+      if(id === 0){
+        preservedCol = col
+      }else if(preservedCol === col) continue
+
       for(let j = col; j < width * width; j = j+width){
-        setScore(prev => prev + 60)
         if(board[j].type === "horizon"){
-            // horOrVerColor({
-            //     board,
-            //     specialColorId: j,
-            //     isVer: false,
-            //     isHor: true,
-            //     setScore
-            // })
             console.log("find-horizon");
             checkHorizonColor({indexArr: [j], board, setScore})
+            continue
         }
         // if(j % width !== col && board[j].type === "vertical"){
         //   console.log("find another vertical");
@@ -97,13 +124,42 @@ console.log("colArr: "+ colArr);
         // }
         if(board[j].type === "wrapped"){
             console.log("find-wrapped in vertical");
-            checkWrappedCandy({board, setScore, indexArr: [j]})
+            checkWrappedCandy({board, setScore, indexArr: [j], strippedIndex: square})
+            continue
         }
+        if(board[j].src === blank) continue
+        setScore(prev => prev + 60)
         board[j] = {
-            src:blank, color:"blank", type: "blank"
-            }
+          src:blank, color:"blank", type: "blank"
+        }
       }
-    })
+    }
+
+console.log(indexArr);
+console.log("verArr: "+ verArr);
+    // colArr.forEach(col => {
+    //   for(let j = col; j < width * width; j = j+width){
+    //     if(board[j].type === "horizon"){
+    //         console.log("find-horizon");
+    //         checkHorizonColor({indexArr: [j], board, setScore})
+    //         continue
+    //     }
+    //     // if(j % width !== col && board[j].type === "vertical"){
+    //     //   console.log("find another vertical");
+    //     //   checkVerticalColor({indexArr: [j], board, setScore})
+    //     // }
+    //     if(board[j].type === "wrapped"){
+    //         console.log("find-wrapped in vertical");
+    //         checkWrappedCandy({board, setScore, indexArr: [j], strippedIndex: j})
+    //         continue
+    //     }
+    //     if(board[j].src === blank) continue
+    //     setScore(prev => prev + 60)
+    //     board[j] = {
+    //       src:blank, color:"blank", type: "blank"
+    //     }
+    //   }
+    // })
     console.log("clear vertical");
 }
 
@@ -120,17 +176,12 @@ export const checkSpecialColor = ({
         if(board[i].type === "vertical" && (
           i !== secondSquareId && i !== firstSquareId
         )){
-                  // horOrVerColor({
-                  //     board,
-                  //     specialColorId: i,
-                  //     isVer: true,
-                  //     isHor: false,
-                  //     setScore
-                  // })
-          console.log("i: "+i+"row: "+row);
+          console.log("i: "+i+" row: "+row);
           console.log("find vertical in specialColor");
           checkVerticalColor({indexArr: [i], board, setScore})
+          continue
         }
+        if(board[i].src === blank) continue
         setScore(prev => prev + 60)
         board[i] = {
           src:blank, color:"blank", type: "blank"
@@ -151,6 +202,7 @@ export const checkSpecialColor = ({
             console.log("j: " + j + "col: "+col);
             console.log("find horizon in specialColor");
             checkHorizonColor({indexArr: [j], board, setScore})
+            continue
           }
           setScore(prev => prev + 60)
           board[j] = {
@@ -205,9 +257,11 @@ export const checkSpecialColor = ({
                 (countForColumn === 3 && i % width !== coefficientForCol+1)
             ){
               checkVerticalColor({indexArr: [i], board, setScore})
+              continue
             }
           }
         }
+        if(board[i].src === blank) continue
         setScore(prev => prev + 60)
         board[i] = {
           src:blank, color:"blank", type: "blank"
@@ -223,9 +277,11 @@ export const checkSpecialColor = ({
                   (countForRow === 3 && parseInt(k/width) !== coefficientForRow+2)
                 ){
                   checkHorizonColor({indexArr: [k], board, setScore})
+                  continue
                 }
               }
             }
+            if(board[j].src === blank) continue
             setScore(prev => prev + 60)
             board[k] = {
               src:blank, color:"blank", type: "blank"
@@ -237,5 +293,7 @@ export const checkSpecialColor = ({
     }
 
     else if(firstSquareType === "wrapped" && secondSquareType === "wrapped"){
+      pauseTime()
+      console.log("wrapped + wrapped");
     }
 }
