@@ -3,6 +3,7 @@ import blank from '../images/blank.png'
 import { horizonCandyColors, verticalCandyColors } from "./Candy"
 import { checkHorizonColor, checkVerticalColor } from "./CheckStrippedCandy"
 import { checkWrappedCandy } from "./CheckWrappedCandy"
+import { checkFishCandy } from "./CheckFishCandy"
 
 export const checkColumnForFour = ({board, setScore, isDragged}) => {
     for(let i = 0; i < 5 * width; i++) {
@@ -17,6 +18,8 @@ export const checkColumnForFour = ({board, setScore, isDragged}) => {
               checkVerticalColor({indexArr: columnForFour, board, setScore})
             }else if(columnForFour.some(square => board[square].type === "wrapped")){
               checkWrappedCandy({board, setScore, indexArr: columnForFour, strippedIndex: null})
+            }else if(columnForFour.some(square => board[square].type === "fish")){
+              checkFishCandy({indexArr: columnForFour, board, setScore})
             }
 
             const index = horizonCandyColors.color.indexOf(chosenColor)
@@ -52,6 +55,8 @@ export const checkRowForFour = ({board, setScore, isDragged}) => {
                 checkVerticalColor({indexArr: rowForFour, board, setScore})
             }else if(rowForFour.some(square => board[square].type === "wrapped")){
                 checkWrappedCandy({board, setScore, indexArr: rowForFour, strippedIndex: null})
+            }else if(rowForFour.some(square => board[square].type === "fish")){
+                checkFishCandy({indexArr: rowForFour, board, setScore})
             }
             
             const index = verticalCandyColors.color.indexOf(chosenColor)
@@ -83,12 +88,16 @@ export const checkColumnForThree = ({board, setScore}) => {
                 checkVerticalColor({indexArr: columnForThree, board, setScore})
             }else if(columnForThree.some(square => board[square].type === "wrapped")){
                 checkWrappedCandy({indexArr: columnForThree, board, setScore, strippedIndex: null})
+            }else if(columnForThree.some(square => board[square].type === "fish")){
+                checkFishCandy({indexArr: columnForThree, board, setScore})
             }
-            else {
-                setScore(prev => prev + 60)
-                columnForThree.forEach(square => board[square] = {
-                src:blank, color:"blank", type: "blank"
-                })
+            for(let i = 0; i < columnForThree.length; i++){
+                if(columnForThree[i].src !== blank){
+                    setScore(prev => prev + 60)
+                    columnForThree.forEach(square => board[square] = {
+                    src:blank, color:"blank", type: "blank"
+                    })
+                }
             }
             return {isTrue: true, indexArr: columnForThree}
         }
@@ -112,12 +121,16 @@ export const checkRowForThree = ({board, setScore}) => {
                 checkVerticalColor({indexArr: rowForThree, board, setScore})
             }else if(rowForThree.some(square => board[square].type === "wrapped")){
                 checkWrappedCandy({indexArr: rowForThree, board, setScore, strippedIndex: null})
+            }else if(rowForThree.some(square => board[square].type === "fish")){
+                checkFishCandy({indexArr: rowForThree, board, setScore})
             }
-            else{
-                setScore(prev => prev + 60)
-                rowForThree.forEach(square => board[square] = {
-                src:blank, color:"blank", type: "blank"
-                })
+            for(let i = 0; i < rowForThree.length; i++){
+                if(rowForThree[i].src !== blank){
+                    setScore(prev => prev + 60)
+                    rowForThree.forEach(square => board[square] = {
+                    src:blank, color:"blank", type: "blank"
+                    })
+                }
             }
             return {isTrue: true, indexArr: rowForThree}
         }
@@ -165,7 +178,7 @@ export const checkRowForThree = ({board, setScore}) => {
 // }
 
 export const updateBoard = ({board}) => {
-    for(let i = 0; i < width * 7; i++){
+    for(let i = 0; i < width * (width - 1); i++){
         const isFirstRow = i >= 0 && i <= (width - 1)
 
         if(isFirstRow && board[i].src === blank){

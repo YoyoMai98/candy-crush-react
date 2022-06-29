@@ -6,7 +6,8 @@ import useTime from "./hooks/useTime";
 import {checkColumnForFour, checkColumnForThree, checkRowForThree, checkRowForFour, updateBoard} from "./business/CheckBoard";
 import { checkHorizonColor, checkVerticalColor, checkSpecialColor } from "./business/CheckStrippedCandy"
 import { checkColorForSix, checkWrappedCandy } from "./business/CheckWrappedCandy"
-import { width, verticalCandyColors, horizonCandyColors, wrappedCandyColors } from "./business/Candy";
+import { checkColorForSquare } from "./business/CheckFishCandy";
+import { width, verticalCandyColors, horizonCandyColors, wrappedCandyColors, fishCandy } from "./business/Candy";
 import ScoreBoard from "./components/ScoreBoard";
 
 function App() {
@@ -42,15 +43,20 @@ function App() {
     const draggedSquareType = draggedSquare.getAttribute('type')
     const replacedSquareType = replacedSquare.getAttribute('type')
 
+    const draggedSquareClassName = draggedSquare.getAttribute('className')
+    const replacedSquareClassName = replacedSquare.getAttribute('className')
+
     board[replacedSquareId] = {
       src: draggedSquareSrc,
       color: draggedSquareColor,
-      type: draggedSquareType
+      type: draggedSquareType,
+      className : draggedSquareClassName
     }
     board[draggedSquareId] = {
       src: replacedSquareSrc,
       color: replacedSquareColor,
-      type: replacedSquareType
+      type: replacedSquareType,
+      className: replacedSquareClassName
     }
 
     const validIndex = [
@@ -61,19 +67,8 @@ function App() {
     ]
 
     if(replacedSquareId && validIndex.includes(replacedSquareId)){
-      const checkColumn = checkColumnForFour({board, setScore, isDragged})
-      const checkRow = checkRowForFour({board, setScore, isDragged})
-      const checkWrap = checkColorForSix({board, setScore, isDragged})
-      const checkColThree = checkColumnForThree({board, setScore, isDragged})
-      const checkRowThree = checkRowForThree({board, setScore, isDragged})
-console.log("--checkColumnForFour--");
-console.log(checkColumn);
-console.log("--checkRowForFour--");
-console.log(checkRow);
-console.log("--checkColorForSix--");
-console.log(checkWrap);
-      isDragged = false
-
+      console.log("draggedSquareId: " + draggedSquareId + ", " + draggedSquareType);
+      console.log("replacedSquareId: " +replacedSquareId +", " +  replacedSquareType);
       if(checkSpecialColor({
         firstSquareType: draggedSquareType, secondSquareType: replacedSquareType,
         firstSquareId: draggedSquareId, secondSquareId: replacedSquareId,
@@ -85,8 +80,20 @@ console.log(checkWrap);
         resumeTime()
         return
       }
-
-      else if(checkColumn !== undefined && checkColumn.isTrue){
+      const checkColumn = checkColumnForFour({board, setScore, isDragged})
+      const checkRow = checkRowForFour({board, setScore, isDragged})
+      const checkWrap = checkColorForSix({board, setScore, isDragged})
+      const checkFish = checkColorForSquare({board, setScore, isDragged})
+console.log("--checkColumnForFour--");
+console.log(checkColumn);
+console.log("--checkRowForFour--");
+console.log(checkRow);
+console.log("--checkColorForSix--");
+console.log(checkWrap);
+console.log("--checkColorForSquare--");
+console.log(checkFish);
+      isDragged = false
+      if(checkColumn !== undefined && checkColumn.isTrue){
         if(draggedSquareType === "horizon" || replacedSquareType === "horizon"){
           checkHorizonColor({indexArr: checkColumn.indexArr, board, setScore})
         }else if(draggedSquareType === "vertical" || replacedSquareType === "vertical"){
@@ -101,13 +108,15 @@ console.log("checkColumn");
           board[replacedSquareId] = {
             src: horizonCandyColors.src[index],
             color: color,
-            type: "horizon"
+            type: "horizon",
+            className: ""
           }
         }else{
           board[draggedSquareId] = {
             src: horizonCandyColors.src[index],
             color: color,
-            type: "horizon"
+            type: "horizon",
+            className: ""
           }
         }
         setDraggedSquare(null)
@@ -130,13 +139,15 @@ console.log("checkRow");
           board[replacedSquareId] = {
             src: verticalCandyColors.src[index],
             color: color,
-            type: "vertical"
+            type: "vertical",
+            className: ""
           }
         }else{
           board[draggedSquareId] = {
             src: verticalCandyColors.src[index],
             color: color,
-            type: "vertical"
+            type: "vertical",
+            className: ""
           }
         }
         setDraggedSquare(null)
@@ -152,13 +163,15 @@ console.log("checkRow");
           board[replacedSquareId] = {
             src: wrappedCandyColors.src[index],
             color: color,
-            type: "wrapped"
+            type: "wrapped",
+            className: ""
           }
         }else{
           board[draggedSquareId] = {
             src: wrappedCandyColors.src[index],
             color: color,
-            type: "wrapped"
+            type: "wrapped",
+            className: ""
           }
         }
         setDraggedSquare(null)
@@ -166,7 +179,33 @@ console.log("checkRow");
         return
       }
 
-      else if((checkColThree !== undefined && checkColThree.isTrue) ||
+      else if(checkFish !== undefined && checkFish.isTrue){
+        console.log("checkFish");
+        const color = checkFish.color
+        const index = fishCandy.color.indexOf(color)
+        if(color === draggedSquareColor){
+          board[replacedSquareId] = {
+            src: fishCandy.src[index],
+            color: color,
+            type: "fish",
+            className: ""
+          }
+        }else{
+          board[draggedSquareId] = {
+            src: fishCandy.src[index],
+            color: color,
+            type: "fish",
+            className: ""
+          }
+        }
+        setDraggedSquare(null)
+        setReplacedSquare(null)
+        return
+      }
+
+      const checkColThree = checkColumnForThree({board, setScore, isDragged})
+      const checkRowThree = checkRowForThree({board, setScore, isDragged})
+      if((checkColThree !== undefined && checkColThree.isTrue) ||
               (checkRowThree !== undefined && checkRowThree.isTrue)
         ){
           console.log(true);
@@ -179,12 +218,14 @@ console.log("checkRow");
         board[replacedSquareId] = {
           src: replacedSquareSrc,
           color: replacedSquareColor,
-          type: replacedSquareType
+          type: replacedSquareType,
+          className: replacedSquareClassName
         }
         board[draggedSquareId] = {
             src: draggedSquareSrc,
             color: draggedSquareColor,
-            type: draggedSquareType
+            type: draggedSquareType,
+            className: draggedSquareClassName
           }
         setBoard([...board])
       }
@@ -193,12 +234,14 @@ console.log("checkRow");
       board[replacedSquareId] = {
         src: replacedSquareSrc,
         color: replacedSquareColor,
-        type: replacedSquareType
+        type: replacedSquareType,
+        className: replacedSquareClassName
       }
       board[draggedSquareId] = {
           src: draggedSquareSrc,
           color: draggedSquareColor,
-          type: draggedSquareType
+          type: draggedSquareType,
+          className: draggedSquareClassName
         }
       isDragged = false
       setBoard([...board])
@@ -210,6 +253,7 @@ console.log("checkRow");
       checkColumnForFour({board, setScore, isDragged})
       checkRowForFour({board, setScore, isDragged})
       checkColorForSix({board, setScore, isDragged})
+      checkColorForSquare({board, setScore, isDragged})
       checkColumnForThree({board, setScore})
       checkRowForThree({board, setScore})
       updateBoard({board})
@@ -231,6 +275,7 @@ console.log("checkRow");
       <div className="game">
         {board.map((candyColor, index) => (
           <img
+            className={candyColor.className}
             src={candyColor.src}
             color={candyColor.color}
             type={candyColor.type}

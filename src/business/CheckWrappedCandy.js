@@ -1,6 +1,7 @@
 import { width, wrappedCandyColors } from "./Candy"
 import blank from '../images/blank.png'
 import { checkHorizonColor, checkVerticalColor } from "./CheckStrippedCandy"
+import { checkFishCandy } from "./CheckFishCandy"
 
 export const checkColorForSix = ({board, setScore, isDragged}) => {
   for(let i = 0; i < (width - 2) * width - 2; i++){
@@ -74,6 +75,8 @@ export const checkColorForSix = ({board, setScore, isDragged}) => {
         checkVerticalColor({indexArr: arrForSix, board, setScore})
       }else if(arrForSix.some(square => board[square].type === "wrapped")){
         checkWrappedCandy({indexArr: arrForSix, board, setScore, strippedIndex: null})
+      }else if(arrForSix.some(square => board[square].type === "fish")){
+        checkFishCandy({indexArr: arrForSix, board, setScore})
       }
       const index = wrappedCandyColors.color.indexOf(chosenColor)
       setScore(prev => prev + 200)
@@ -91,7 +94,7 @@ export const checkColorForSix = ({board, setScore, isDragged}) => {
   }
 }
 
-export const checkWrappedCandy = ({board, setScore, indexArr, strippedIndex}) => {
+export const checkWrappedCandy = ({board, setScore, indexArr, strippedIndex, isRandom}) => {
   let wrapIndex
   indexArr.forEach(square => {
     if(board[square].type === "wrapped"){
@@ -100,6 +103,10 @@ export const checkWrappedCandy = ({board, setScore, indexArr, strippedIndex}) =>
     }
   })
 
+  if(!wrapIndex && isRandom){
+    wrapIndex = indexArr[0]
+  }
+console.log("wrapIndex: " + wrapIndex);
   const row = parseInt(wrapIndex / width)
   const col = wrapIndex % width
 
@@ -141,6 +148,10 @@ export const checkWrappedCandy = ({board, setScore, indexArr, strippedIndex}) =>
     ) {
       console.log("find-horizon in wrap")
       checkHorizonColor({indexArr: [arr[i]], board, setScore})
+      continue
+    }else if(board[arr[i]].type === "fish"){
+      console.log("find-fish in wrap");
+      checkFishCandy({indexArr: [arr[i]], board, setScore})
       continue
     }else if(arr[i] !== wrapIndex && board[arr[i]].type === "wrapped"){
       console.log("find-wrapped in wrap");

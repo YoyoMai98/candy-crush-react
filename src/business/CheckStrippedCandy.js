@@ -1,8 +1,9 @@
-import { width, strippedTypes } from "./Candy"
+import { width, strippedTypes, specialTypes } from "./Candy"
 import { checkWrappedCandy } from "./CheckWrappedCandy"
 import blank from '../images/blank.png'
+import { checkFishCandy, randomSquare } from "./CheckFishCandy"
 
-export const checkHorizonColor = ({indexArr, board, setScore}) => {
+export const checkHorizonColor = ({indexArr, board, setScore, isRandom}) => {
     // let rowArr = []
     let horArr = []
     let verArr = []
@@ -21,7 +22,11 @@ export const checkHorizonColor = ({indexArr, board, setScore}) => {
       checkVerticalColor({indexArr: verArr, board, setScore})
     }
     if(horArr.length === 0){
-      return
+      if(isRandom){
+        horArr = indexArr
+      }else{
+        return
+      }
     }
 
     console.log(indexArr);
@@ -46,6 +51,11 @@ export const checkHorizonColor = ({indexArr, board, setScore}) => {
         if(board[j].type === "wrapped"){
           console.log("find-wrapped in horizon");
           checkWrappedCandy({board, setScore, indexArr: [j], strippedIndex: square})
+          continue
+        }
+        if(board[j].type === "fish"){
+          console.log("find-fish in horizon");
+          checkFishCandy({board, setScore, indexArr: [j]})
           continue
         }
         if(board[j].src !== blank){
@@ -82,7 +92,7 @@ export const checkHorizonColor = ({indexArr, board, setScore}) => {
     console.log("clear horizontal");
 }
 
-export const checkVerticalColor = ({indexArr, board, setScore}) => {
+export const checkVerticalColor = ({indexArr, board, setScore, isRandom}) => {
     // let colArr = []
     let horArr = []
     let verArr = []
@@ -101,7 +111,11 @@ export const checkVerticalColor = ({indexArr, board, setScore}) => {
       checkHorizonColor({indexArr: horArr, board, setScore})
     }
     if(verArr.length === 0){
-      return
+      if(isRandom){
+        verArr = indexArr
+      }else{
+        return
+      }
     }
 
     for(let id = 0; id < verArr.length; id++){
@@ -127,6 +141,10 @@ export const checkVerticalColor = ({indexArr, board, setScore}) => {
             checkWrappedCandy({board, setScore, indexArr: [j], strippedIndex: square})
             continue
         }
+        if(board[j].type === "fish"){
+          console.log("find-fish in vertical");
+          checkFishCandy({board, setScore, indexArr: [j]})
+        }
         if(board[j].src === blank) continue
         setScore(prev => prev + 60)
         board[j] = {
@@ -137,29 +155,6 @@ export const checkVerticalColor = ({indexArr, board, setScore}) => {
 
 console.log(indexArr);
 console.log("verArr: "+ verArr);
-    // colArr.forEach(col => {
-    //   for(let j = col; j < width * width; j = j+width){
-    //     if(board[j].type === "horizon"){
-    //         console.log("find-horizon");
-    //         checkHorizonColor({indexArr: [j], board, setScore})
-    //         continue
-    //     }
-    //     // if(j % width !== col && board[j].type === "vertical"){
-    //     //   console.log("find another vertical");
-    //     //   checkVerticalColor({indexArr: [j], board, setScore})
-    //     // }
-    //     if(board[j].type === "wrapped"){
-    //         console.log("find-wrapped in vertical");
-    //         checkWrappedCandy({board, setScore, indexArr: [j], strippedIndex: j})
-    //         continue
-    //     }
-    //     if(board[j].src === blank) continue
-    //     setScore(prev => prev + 60)
-    //     board[j] = {
-    //       src:blank, color:"blank", type: "blank"
-    //     }
-    //   }
-    // })
     console.log("clear vertical");
 }
 
@@ -179,6 +174,18 @@ export const checkSpecialColor = ({
           console.log("i: "+i+" row: "+row);
           console.log("find vertical in specialColor");
           checkVerticalColor({indexArr: [i], board, setScore})
+          continue
+        }
+        if(board[i].type === "fish"){
+          console.log("find fish in specialColor");
+          checkFishCandy({indexArr: [i], board, setScore})
+          continue
+        }
+        if(board[i].type === "wrapped" && (
+          i !== secondSquareId && i !== firstSquareId
+        )){
+          console.log("find wrapped in specialColor");
+          checkWrappedCandy({indexArr: [i], board, setScore})
           continue
         }
         if(board[i].src === blank) continue
@@ -204,6 +211,19 @@ export const checkSpecialColor = ({
             checkHorizonColor({indexArr: [j], board, setScore})
             continue
           }
+          if(board[j].type === "fish"){
+            console.log("find fish in specialColor");
+            checkFishCandy({indexArr: [j], board, setScore})
+            continue
+          }
+          if(board[j].type === "wrapped" && (
+            j !== secondSquareId && j !== firstSquareId
+          )){
+            console.log("find wrapped in specialColor");
+            checkWrappedCandy({indexArr: [j], board, setScore})
+            continue
+          }
+          if(board[j].src === blank) continue
           setScore(prev => prev + 60)
           board[j] = {
             src:blank, color:"blank", type: "blank"
@@ -254,12 +274,23 @@ export const checkSpecialColor = ({
         if(board[i].type === "vertical"){
           if(i % width !== coefficientForCol && i % width !== coefficientForCol+1){
             if((countForColumn === 2) ||
-                (countForColumn === 3 && i % width !== coefficientForCol+1)
+                (countForColumn === 3 && i % width !== coefficientForCol+2)
             ){
               checkVerticalColor({indexArr: [i], board, setScore})
               continue
             }
           }
+        }
+        if(board[i].type === "wrapped" && (
+          i !== secondSquareId && i !== firstSquareId
+        )){
+          checkWrappedCandy({indexArr: [i], board, setScore})
+          continue
+        }
+        if(board[i].type === "fish"){
+          console.log("find fish in wrapped & stripped");
+          checkFishCandy({indexArr: [i], board, setScore})
+          continue
         }
         if(board[i].src === blank) continue
         setScore(prev => prev + 60)
@@ -281,7 +312,18 @@ export const checkSpecialColor = ({
                 }
               }
             }
-            if(board[j].src === blank) continue
+            if(board[k].type === "wrapped" && (
+              k !== secondSquareId && k !== firstSquareId
+            )){
+              checkWrappedCandy({indexArr: [k], board, setScore})
+              continue
+            }
+            if(board[k].type === "fish"){
+              console.log("find fish in wrapped & stripped");
+              checkFishCandy({indexArr: [k], board, setScore})
+              continue
+            }
+            if(board[k].src === blank) continue
             setScore(prev => prev + 60)
             board[k] = {
               src:blank, color:"blank", type: "blank"
@@ -295,5 +337,89 @@ export const checkSpecialColor = ({
     else if(firstSquareType === "wrapped" && secondSquareType === "wrapped"){
       pauseTime()
       console.log("wrapped + wrapped");
+      return true
+    }
+
+    else if(firstSquareType === "fish" && secondSquareType === "fish"){
+      pauseTime()
+      board[firstSquareId] = {
+        src: blank, color:"blank", type: "blank"
+      }
+      board[secondSquareId] = {
+        src: blank, color:"blank", type: "blank"
+      }
+
+      for(let i = 0; i < 3; i++){
+        const randomIndex = randomSquare()
+        console.log("randomIndex" + randomIndex);
+        board[randomIndex].className = "special"
+        if(board[randomIndex].type === "vertical"){
+            checkVerticalColor({indexArr: [randomIndex], board, setScore})
+        }else if(board[randomIndex].type === "horizon"){
+            checkHorizonColor({indexArr: [randomIndex], board, setScore})
+        }else if(board[randomIndex].type === "wrapped"){
+            checkWrappedCandy({indexArr: [randomIndex], board, setScore, strippedIndex: null})
+        }else if(board[randomIndex].type === "fish"){
+            checkFishCandy({indexArr: [randomIndex], board, setScore})
+        }
+        if(board[randomIndex].src !== blank){
+            board[randomIndex] = {
+                src: blank, color:"blank", type: "blank"
+            }
+        }
+        board[randomIndex].className = ""
+      }
+      console.log("fish+fish");
+      return true
+    }
+
+    else if(firstSquareType === "fish" && specialTypes.includes(secondSquareType)){
+      pauseTime()
+      board[firstSquareId] = {
+        src: blank, color:"blank", type: "blank"
+      }
+      board[secondSquareId] = {
+        src: blank, color:"blank", type: "blank"
+      }
+      const randomIndex = randomSquare()
+      board[randomIndex].className = "special"
+      console.log("randomIndex: "+randomIndex);
+      console.log(board[randomIndex]);
+      if(secondSquareType === "horizon"){
+        console.log("fish + horizon");
+        checkHorizonColor({indexArr: [randomIndex], board, setScore, isRandom: true});
+      }else if(secondSquareType === "vertical"){
+        console.log("fish + vertical");
+        checkVerticalColor({indexArr: [randomIndex], board, setScore, isRandom: true})
+      }else if(secondSquareType === "wrapped"){
+        console.log("fish + wrapped");
+        checkWrappedCandy({indexArr: [randomIndex], board, setScore, isRandom: true})
+      }
+      board[randomIndex].className = ""
+      return true
+    }
+
+    else if(secondSquareType === "fish" && specialTypes.includes(firstSquareType)){
+      pauseTime()
+      board[firstSquareId] = {
+        src: blank, color:"blank", type: "blank"
+      }
+      board[secondSquareId] = {
+        src: blank, color:"blank", type: "blank"
+      }
+      const randomIndex = randomSquare()
+      board[randomIndex].className = "special"
+      if(firstSquareType === "horizon"){
+        console.log("fish + horizon");
+        checkHorizonColor({indexArr: [randomIndex], board, setScore, isRandom: true})
+      }else if(firstSquareType === "vertical"){
+        console.log("fish + vertical");
+        checkVerticalColor({indexArr: [randomIndex], board, setScore, isRandom: true})
+      }else if(firstSquareType === "wrapped"){
+        console.log("fish + wrapped");
+        checkWrappedCandy({indexArr: [randomIndex], board, setScore, isRandom: true})
+      }
+      board[randomIndex].className = ""
+      return true
     }
 }

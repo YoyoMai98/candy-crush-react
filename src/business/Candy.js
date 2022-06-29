@@ -26,6 +26,13 @@ import wrapredCandy from '../images/speical candy/wrapped-red-candy.png'
 import wrapgreenCandy from '../images/speical candy/wrapped-green-candy.png'
 import wrapyellowCandy from '../images/speical candy/wrapped-yellow-candy.png'
 
+import fishblueCandy from '../images/speical candy/fish-blue.png'
+import fishorangeCandy from '../images/speical candy/fish-orange.png'
+import fishpurpleCandy from '../images/speical candy/fish-purple.png'
+import fishredCandy from '../images/speical candy/fish-red.png'
+import fishgreenCandy from '../images/speical candy/fish-green.png'
+import fishyellowCandy from '../images/speical candy/fish-yellow.png'
+
 export const width = 8
 
 export const candyColors = {
@@ -80,7 +87,20 @@ export const wrappedCandyColors = {
     type: "wrapped"
 }
 
-export const specialTypes = ["wrapped"]
+export const fishCandy = {
+    src:[
+    fishblueCandy,
+    fishorangeCandy,
+    fishpurpleCandy,
+    fishyellowCandy,
+    fishredCandy,
+    fishgreenCandy    
+    ],
+    color: ["blue", "orange", "purple", "yellow", "red", "green"],
+    type: "fish"
+}
+
+export const specialTypes = ["horizon", "vertical", "wrapped"]
 export const strippedTypes = ["horizon", "vertical"]
 
 export const randomColors = () => {
@@ -88,5 +108,5 @@ export const randomColors = () => {
     const src = candyColors.src[randomIndex]
     const color = candyColors.color[randomIndex]
     const type = "normal"
-    return {src, color, type}
+    return {src, color, type, className: ""}
 }
