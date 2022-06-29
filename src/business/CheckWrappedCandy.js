@@ -103,8 +103,12 @@ export const checkWrappedCandy = ({board, setScore, indexArr, strippedIndex, isR
     }
   })
 
-  if(!wrapIndex && isRandom){
-    wrapIndex = indexArr[0]
+  if(!wrapIndex){
+    if(isRandom){
+      wrapIndex = indexArr[0]
+    }else{
+      return
+    }
   }
 console.log("wrapIndex: " + wrapIndex);
   const row = parseInt(wrapIndex / width)

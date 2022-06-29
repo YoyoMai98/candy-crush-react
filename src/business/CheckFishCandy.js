@@ -6,12 +6,18 @@ import { checkWrappedCandy } from "./CheckWrappedCandy"
 export const checkColorForSquare = ({board, setScore, isDragged}) => {
     for(let i = 0; i < (width-1) * width - 1; i++){
         const colorForSquare = [i, i+1, i+width, i+width+1]
+        const colorNearby = [i-1, i+2, i+width-1, i+width+2, i-width, i-width+1, i+width*2, i+width*2+1]
         const chosenColor = board[i].color
         const isBlank = board[i].src === blank
 
         if(i % width === 7) continue
 
         if(colorForSquare.every(square => board[square].color === chosenColor && !isBlank)){
+            for(let j = 0; j < colorNearby.length; j++){
+                if(colorNearby[j] && board[colorNearby[j]] && board[colorNearby[j]].color === chosenColor){
+                    colorForSquare.push(colorNearby[j])
+                }
+            }
             if(colorForSquare.some(square => board[square].type === "horizon")){
                 checkHorizonColor({indexArr: colorForSquare, board, setScore})
             }else if(colorForSquare.some(square => board[square].type === "vertical")){
@@ -75,6 +81,7 @@ console.log(randomIndex);
         }
 
         if(board[randomIndex].src !== blank){
+            setScore(prev => prev + 20)
             board[randomIndex] = {
                 src: blank, color:"blank", type: "blank"
             }

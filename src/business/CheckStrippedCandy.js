@@ -66,29 +66,6 @@ export const checkHorizonColor = ({indexArr, board, setScore, isRandom}) => {
         }
       }
     }
-    // rowArr.forEach(row => {
-    //   for(let j = row * width; j < row * width + width; j++){
-    //     if(board[j].type === "vertical") {
-    //         console.log("find-vertical");
-    //         checkVerticalColor({indexArr: [j], board, setScore})
-    //         continue
-    //     }
-    //     // if(parseInt(j / width) !== row && board[j].type === "horizon"){
-    //     //   checkHorizonColor({indexArr: [j], board, setScore})
-    //     // }
-    //     if(board[j].type === "wrapped"){
-    //       console.log("find-wrapped in horizon");
-    //       checkWrappedCandy({board, setScore, indexArr: [j], strippedIndex: j})
-    //       continue
-    //     }
-    //     if(board[j].src !== blank){
-    //       setScore(prev => prev + 60)
-    //       board[j] = {
-    //         src:blank, color:"blank", type: "blank"
-    //         }
-    //     }
-    //   }
-    // })
     console.log("clear horizontal");
 }
 
@@ -363,6 +340,7 @@ export const checkSpecialColor = ({
             checkFishCandy({indexArr: [randomIndex], board, setScore})
         }
         if(board[randomIndex].src !== blank){
+          setScore(prev => prev + 60)
             board[randomIndex] = {
                 src: blank, color:"blank", type: "blank"
             }
