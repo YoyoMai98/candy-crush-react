@@ -47,8 +47,11 @@ export const checkColorForSquare = ({board, setScore, isDragged}) => {
     }
 }
 
-export const randomSquare = () => {
-    const randomIndex = Math.floor(Math.random() * (width * width))
+export const randomSquare = ({board}) => {
+    let randomIndex = Math.floor(Math.random() * (width * width))
+    if(board[randomIndex].src === blank){
+        randomIndex = randomSquare({board})
+    }
     return randomIndex
 }
 
@@ -65,7 +68,7 @@ export const checkFishCandy = ({indexArr, board, setScore}) => {
     }
 
     fishIndex.forEach(() => {
-        const randomIndex = randomSquare()
+        const randomIndex = randomSquare({board})
 console.log("find fish");
 console.log(randomIndex);
         board[randomIndex].className = "special"

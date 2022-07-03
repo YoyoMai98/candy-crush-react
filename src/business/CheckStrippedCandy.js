@@ -2,6 +2,7 @@ import { width, strippedTypes, specialTypes } from "./Candy"
 import { checkWrappedCandy } from "./CheckWrappedCandy"
 import blank from '../images/blank.png'
 import { checkFishCandy, randomSquare } from "./CheckFishCandy"
+import { checkColorBomb } from "./CheckBombCandy"
 
 export const checkHorizonColor = ({indexArr, board, setScore, isRandom}) => {
     // let rowArr = []
@@ -40,6 +41,15 @@ export const checkHorizonColor = ({indexArr, board, setScore, isRandom}) => {
       }else if(preservedRow === row) continue
 
       for(let j = row * width; j < row * width + width; j++){
+        if(board[j].type === "bomb") {
+          console.log("find-bomb");
+          checkColorBomb({
+            firstSquareType: "bomb", secondSquareType: board[j+width].type,
+            firstSquareColor: "colorBomb", secondSquareColor: board[j+width].color,
+            firstSquareId: j, secondSquareId: j+width,
+            board, setScore
+          })
+        }
         if(board[j].type === "vertical") {
             console.log("find-vertical");
             checkVerticalColor({indexArr: [j], board, setScore})
@@ -104,6 +114,15 @@ export const checkVerticalColor = ({indexArr, board, setScore, isRandom}) => {
       }else if(preservedCol === col) continue
 
       for(let j = col; j < width * width; j = j+width){
+        if(board[j].type === "bomb") {
+          console.log("find-bomb");
+          checkColorBomb({
+            firstSquareType: "bomb", secondSquareType: board[j+1].type,
+            firstSquareColor: "colorBomb", secondSquareColor: board[j+1].color,
+            firstSquareId: j, secondSquareId: j+1,
+            board, setScore
+          })
+        }
         if(board[j].type === "horizon"){
             console.log("find-horizon");
             checkHorizonColor({indexArr: [j], board, setScore})
@@ -129,7 +148,6 @@ export const checkVerticalColor = ({indexArr, board, setScore, isRandom}) => {
         }
       }
     }
-
 console.log(indexArr);
 console.log("verArr: "+ verArr);
     console.log("clear vertical");
@@ -319,15 +337,9 @@ export const checkSpecialColor = ({
 
     else if(firstSquareType === "fish" && secondSquareType === "fish"){
       pauseTime()
-      board[firstSquareId] = {
-        src: blank, color:"blank", type: "blank"
-      }
-      board[secondSquareId] = {
-        src: blank, color:"blank", type: "blank"
-      }
 
       for(let i = 0; i < 3; i++){
-        const randomIndex = randomSquare()
+        const randomIndex = randomSquare({board})
         console.log("randomIndex" + randomIndex);
         board[randomIndex].className = "special"
         if(board[randomIndex].type === "vertical"){
@@ -347,19 +359,19 @@ export const checkSpecialColor = ({
         }
         board[randomIndex].className = ""
       }
-      console.log("fish+fish");
-      return true
-    }
-
-    else if(firstSquareType === "fish" && specialTypes.includes(secondSquareType)){
-      pauseTime()
       board[firstSquareId] = {
         src: blank, color:"blank", type: "blank"
       }
       board[secondSquareId] = {
         src: blank, color:"blank", type: "blank"
       }
-      const randomIndex = randomSquare()
+      console.log("fish+fish");
+      return true
+    }
+
+    else if(firstSquareType === "fish" && specialTypes.includes(secondSquareType)){
+      pauseTime()
+      const randomIndex = randomSquare({board})
       board[randomIndex].className = "special"
       console.log("randomIndex: "+randomIndex);
       console.log(board[randomIndex]);
@@ -374,18 +386,18 @@ export const checkSpecialColor = ({
         checkWrappedCandy({indexArr: [randomIndex], board, setScore, isRandom: true})
       }
       board[randomIndex].className = ""
-      return true
-    }
-
-    else if(secondSquareType === "fish" && specialTypes.includes(firstSquareType)){
-      pauseTime()
       board[firstSquareId] = {
         src: blank, color:"blank", type: "blank"
       }
       board[secondSquareId] = {
         src: blank, color:"blank", type: "blank"
       }
-      const randomIndex = randomSquare()
+      return true
+    }
+
+    else if(secondSquareType === "fish" && specialTypes.includes(firstSquareType)){
+      pauseTime()
+      const randomIndex = randomSquare({board})
       board[randomIndex].className = "special"
       if(firstSquareType === "horizon"){
         console.log("fish + horizon");
@@ -398,6 +410,12 @@ export const checkSpecialColor = ({
         checkWrappedCandy({indexArr: [randomIndex], board, setScore, isRandom: true})
       }
       board[randomIndex].className = ""
+      board[firstSquareId] = {
+        src: blank, color:"blank", type: "blank"
+      }
+      board[secondSquareId] = {
+        src: blank, color:"blank", type: "blank"
+      }
       return true
     }
 }

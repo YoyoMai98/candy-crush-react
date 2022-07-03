@@ -33,6 +33,8 @@ import fishredCandy from '../images/speical candy/fish-red.png'
 import fishgreenCandy from '../images/speical candy/fish-green.png'
 import fishyellowCandy from '../images/speical candy/fish-yellow.png'
 
+import colorBomb from '../images/speical candy/bomb.png'
+
 export const width = 8
 
 export const candyColors = {
@@ -98,6 +100,12 @@ export const fishCandy = {
     ],
     color: ["blue", "orange", "purple", "yellow", "red", "green"],
     type: "fish"
+}
+
+export const bombCandy = {
+    src: [colorBomb],
+    color: ["colorBomb"],
+    type: "bomb"
 }
 
 export const specialTypes = ["horizon", "vertical", "wrapped"]

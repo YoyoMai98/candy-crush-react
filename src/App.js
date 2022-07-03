@@ -7,8 +7,9 @@ import {checkColumnForFour, checkColumnForThree, checkRowForThree, checkRowForFo
 import { checkHorizonColor, checkVerticalColor, checkSpecialColor } from "./business/CheckStrippedCandy"
 import { checkColorForSix, checkWrappedCandy } from "./business/CheckWrappedCandy"
 import { checkColorForSquare } from "./business/CheckFishCandy";
-import { width, verticalCandyColors, horizonCandyColors, wrappedCandyColors, fishCandy } from "./business/Candy";
+import { width, verticalCandyColors, horizonCandyColors, wrappedCandyColors, fishCandy, bombCandy } from "./business/Candy";
 import ScoreBoard from "./components/ScoreBoard";
+import { checkColorBomb, checkColumnForFive, checkRowForFive } from "./business/CheckBombCandy";
 
 function App() {
   const [score, setScore] = useState(0)
@@ -75,11 +76,74 @@ function App() {
         board, setScore, pauseTime
       })){
         console.log("checkSpecialColor");
+
         setDraggedSquare(null)
         setReplacedSquare(null)
         resumeTime()
         return
       }
+      
+      if(checkColorBomb({
+        firstSquareType: draggedSquareType, secondSquareType: replacedSquareType,
+        firstSquareId: draggedSquareId, secondSquareId: replacedSquareId,
+        firstSquareColor: draggedSquareColor, secondSquareColor: replacedSquareColor,
+        board, setScore
+      })){
+        console.log("checkColorBomb");
+
+        setDraggedSquare(null)
+        setReplacedSquare(null)
+        resumeTime()
+        return
+      }
+      const checkColumnBomb = checkColumnForFive({board, setScore, isDragged})
+      const checkRowBomb = checkRowForFive({board, setScore, isDragged})
+      console.log("--checkColumnForFive--");
+      console.log(checkColumnBomb);
+      console.log("--checkRowForFive--");
+      console.log(checkRowBomb);
+      if(checkColumnBomb !== undefined && checkColumnBomb.isTrue){
+        const color = checkColumnBomb.color
+        if(draggedSquareColor === color){
+          board[replacedSquareId] = {
+            src: bombCandy.src[0],
+            color: bombCandy.color[0],
+            type: "bomb",
+            className: ""
+          }
+        }else if(replacedSquareColor === color){
+          board[draggedSquareId] = {
+            src: bombCandy.src[0],
+            color: bombCandy.color[0],
+            type: "bomb",
+            className: ""
+          }
+        }
+        setDraggedSquare(null)
+        setReplacedSquare(null)
+        return
+      }else if(checkRowBomb !== undefined && checkRowBomb.isTrue){
+        const color = checkRowBomb.color
+        if(draggedSquareColor === color){
+          board[replacedSquareId] = {
+            src: bombCandy.src[0],
+            color: bombCandy.color[0],
+            type: "bomb",
+            className: ""
+          }
+        }else if(replacedSquareColor === color){
+          board[draggedSquareId] = {
+            src: bombCandy.src[0],
+            color: bombCandy.color[0],
+            type: "bomb",
+            className: ""
+          }
+        }
+        setDraggedSquare(null)
+        setReplacedSquare(null)
+        return
+      }
+
       const checkColumn = checkColumnForFour({board, setScore, isDragged})
       const checkRow = checkRowForFour({board, setScore, isDragged})
       const checkWrap = checkColorForSix({board, setScore, isDragged})
@@ -250,6 +314,8 @@ console.log("checkRow");
   }
   useEffect(() => {
     const timer = setInterval(() => {
+      checkColumnForFive({board, setScore, isDragged})
+      checkRowForFive({board, setScore, isDragged})
       checkColumnForFour({board, setScore, isDragged})
       checkRowForFour({board, setScore, isDragged})
       checkColorForSix({board, setScore, isDragged})
