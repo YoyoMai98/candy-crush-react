@@ -43,10 +43,13 @@ export const checkHorizonColor = ({indexArr, board, setScore, isRandom}) => {
       for(let j = row * width; j < row * width + width; j++){
         if(board[j].type === "bomb") {
           console.log("find-bomb");
+          let secondId
+          if(board[j+width]) secondId = j+width
+          else if(board[j-width]) secondId = j-width
           checkColorBomb({
-            firstSquareType: "bomb", secondSquareType: board[j+width].type,
-            firstSquareColor: "colorBomb", secondSquareColor: board[j+width].color,
-            firstSquareId: j, secondSquareId: j+width,
+            firstSquareType: "bomb", secondSquareType: board[secondId].type,
+            firstSquareColor: "colorBomb", secondSquareColor: board[secondId].color,
+            firstSquareId: j, secondSquareId: secondId,
             board, setScore
           })
         }
@@ -116,10 +119,13 @@ export const checkVerticalColor = ({indexArr, board, setScore, isRandom}) => {
       for(let j = col; j < width * width; j = j+width){
         if(board[j].type === "bomb") {
           console.log("find-bomb");
+          let secondId
+          if(board[j+1]) secondId = j+1
+          else if(board[j-1]) secondId = j-1
           checkColorBomb({
-            firstSquareType: "bomb", secondSquareType: board[j+1].type,
-            firstSquareColor: "colorBomb", secondSquareColor: board[j+1].color,
-            firstSquareId: j, secondSquareId: j+1,
+            firstSquareType: "bomb", secondSquareType: board[secondId].type,
+            firstSquareColor: "colorBomb", secondSquareColor: board[secondId].color,
+            firstSquareId: j, secondSquareId: secondId,
             board, setScore
           })
         }
@@ -332,6 +338,73 @@ export const checkSpecialColor = ({
     else if(firstSquareType === "wrapped" && secondSquareType === "wrapped"){
       pauseTime()
       console.log("wrapped + wrapped");
+      const row = parseInt(secondSquareId / width)
+      console.log("row: " + row);
+      const col = secondSquareId % width
+      console.log("col: " + col);
+      let rowStart
+      let rowEnd
+      let colStart
+      let colEnd
+      if(row < 2){
+        rowEnd = row + 3
+        if(row === 0) rowStart = row
+        else if(row === 1) rowStart = row - 1
+      }
+      else if(row > 5){
+        rowStart = row - 2
+        if(row === 6) rowEnd = row + 1
+        else if(row === 7) rowEnd = row
+      }else{
+        rowStart = row - 2
+        rowEnd = row + 3
+      }
+
+      if(col < 2){
+        colEnd = col + 2
+        if(col === 0) colStart = col
+        else if(col === 1) colStart = col - 1
+      }
+      else if(col > 5){
+        colStart = col - 2
+        if(col === 6) colEnd = col + 1
+        else if(col === 7) colEnd = col
+      }else{
+        colStart = col - 2
+        colEnd = col + 2
+      }
+      console.log(rowStart+" - "+rowEnd + " " + colStart+" - "+colEnd);
+      for(let i = rowStart; i <= rowEnd; i++){
+        for(let j = colStart; j <= colEnd; j++){
+          const id = i * width + j
+          if(board[id].src !== blank){
+            if(board[id].type === "horizon"){
+              console.log("find-horizon in two wrap")
+              checkHorizonColor({indexArr: [id], board, setScore})
+              continue
+            }else if(board[id].type === "vertical"){
+              console.log("find-vertical in two wrap")
+              checkVerticalColor({indexArr: [id], board, setScore})
+              continue
+            }else if(board[id].type === "wrapped" &&
+              id !== secondSquareId && id !== firstSquareId
+            ){
+              console.log("find-wrapped in two wrap")
+              checkWrappedCandy({indexArr: [id], board, setScore})
+              continue
+            }else if(board[id].type === "fish"){
+              console.log("find-fish in two wrap")
+              checkFishCandy({indexArr: [id], board, setScore})
+              continue
+            }
+            if(board[id].src === blank) continue
+            setScore(prev => prev + 60)
+            board[id] = {
+              src: blank, color:"blank", type: "blank"
+            }
+          }
+        }
+      }
       return true
     }
 

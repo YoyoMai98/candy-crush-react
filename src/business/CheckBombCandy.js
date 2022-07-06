@@ -29,12 +29,15 @@ export const checkColumnForFive = ({board, setScore, isDragged}) => {
 export const checkRowForFive = ({board, setScore, isDragged}) => {
   for(let i = 0; i < width * width - 4; i++){
     const rowForFive = [i, i+1, i+2, i+3, i+4]
+    const chosenRow = parseInt(i / width)
     const chosenColor = board[i].color
     const isBlank = board[i].src === blank
 
     if(i % width === 7 || i % width === 6 || i % width === 5) continue
 
-    if(rowForFive.every(square => board[square].color === chosenColor) && !isBlank){
+    if(rowForFive.every(square => parseInt(square / width) === chosenRow) &&
+      rowForFive.every(square => board[square].color === chosenColor) &&
+      !isBlank){
       setScore(prev => prev + 200)
       rowForFive.forEach(square => board[square] = {
         src: blank, color:"blank", type: "blank"

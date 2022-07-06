@@ -41,6 +41,7 @@ export const checkColumnForFour = ({board, setScore, isDragged}) => {
 export const checkRowForFour = ({board, setScore, isDragged}) => {
     for(let i = 0; i < width * width - 3; i++) {
         const rowForFour = [i, i + 1, i + 2, i + 3]
+        const chosenRow = parseInt(i / width)
         const chosenColor = board[i].color
         const isBlank = board[i].src === blank
 
@@ -48,7 +49,9 @@ export const checkRowForFour = ({board, setScore, isDragged}) => {
             continue
         }
 
-        if(rowForFour.every(square => board[square].color === chosenColor && !isBlank)) {
+        if(rowForFour.every(square => parseInt(square / width) === chosenRow) &&
+            rowForFour.every(square => board[square].color === chosenColor &&
+            !isBlank)) {
             if(rowForFour.some(square => board[square].type === "horizon")){
                 checkHorizonColor({indexArr: rowForFour, board, setScore})
             }else if(rowForFour.some(square => board[square].type === "vertical")){
@@ -107,6 +110,7 @@ export const checkColumnForThree = ({board, setScore}) => {
 export const checkRowForThree = ({board, setScore}) => {
     for(let i = 0; i < width * width - 2; i++) {
         const rowForThree = [i, i + 1, i + 2]
+        const chosenRow = parseInt(i / width)
         const chosenColor = board[i].color
         const isBlank = board[i].src === blank
 
@@ -114,7 +118,9 @@ export const checkRowForThree = ({board, setScore}) => {
             continue
         }
 
-        if(rowForThree.every(square => board[square].color === chosenColor && !isBlank)) {
+        if(rowForThree.every(square => parseInt(square / width) === chosenRow) &&
+            rowForThree.every(square => board[square].color === chosenColor &&
+                !isBlank)) {
             if(rowForThree.some(square => board[square].type === "horizon")){
                 checkHorizonColor({indexArr: rowForThree, board, setScore})
             }else if(rowForThree.some(square => board[square].type === "vertical")){

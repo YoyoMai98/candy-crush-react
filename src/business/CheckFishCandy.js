@@ -2,6 +2,7 @@ import { width, fishCandy } from "./Candy";
 import blank from '../images/blank.png'
 import { checkHorizonColor, checkVerticalColor } from "./CheckStrippedCandy"
 import { checkWrappedCandy } from "./CheckWrappedCandy"
+import { checkColorBomb } from "./CheckBombCandy";
 
 export const checkColorForSquare = ({board, setScore, isDragged}) => {
     for(let i = 0; i < (width-1) * width - 1; i++){
@@ -73,6 +74,20 @@ console.log("find fish");
 console.log(randomIndex);
         board[randomIndex].className = "special"
         console.log(board[randomIndex]);
+        if(board[randomIndex].type === "bomb") {
+            console.log("find-bomb in fish");
+            let secondId
+            if(board[randomIndex+1]) secondId = randomIndex + 1
+            else if(board[randomIndex+width]) secondId = randomIndex + width
+            else if(board[randomIndex-1]) secondId = randomIndex - 1
+            else if(board[randomIndex-width]) secondId = randomIndex - width
+            checkColorBomb({
+            firstSquareType: "bomb", secondSquareType: board[secondId].type,
+            firstSquareColor: "colorBomb", secondSquareColor: board[secondId].color,
+            firstSquareId: randomIndex, secondSquareId: secondId,
+            board, setScore
+            })
+        }
         if(board[randomIndex].type === "vertical"){
             checkVerticalColor({indexArr: [randomIndex], board, setScore})
         }else if(board[randomIndex].type === "horizon"){

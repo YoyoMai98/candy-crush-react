@@ -94,7 +94,7 @@ export const checkColorForSix = ({board, setScore, isDragged}) => {
   }
 }
 
-export const checkWrappedCandy = ({board, setScore, indexArr, strippedIndex, isRandom}) => {
+export const checkWrappedCandy = ({board, setScore, indexArr, strippedIndex, isRandom, wrappedIndex}) => {
   let wrapIndex
   indexArr.forEach(square => {
     if(board[square].type === "wrapped"){
@@ -141,6 +141,16 @@ console.log("wrapIndex: " + wrapIndex);
   console.log(arr);
   console.log(strippedIndex);
   for(let i = 0; i < arr.length; i++){
+    // if(board[arr[i]].type === "bomb") {
+    //   console.log("find-bomb in wrap");
+    //   checkColorBomb({
+    //     firstSquareType: "bomb", secondSquareType: board[i+1].type,
+    //     firstSquareColor: "colorBomb", secondSquareColor: board[i+1].color,
+    //     firstSquareId: i, secondSquareId: i+1,
+    //     board, setScore
+    //   })
+    //   continue
+    // }
     if(board[arr[i]].type === "vertical" && 
       (strippedIndex === null || (strippedIndex !== null && arr[i] !== strippedIndex))
     ) {
@@ -157,9 +167,11 @@ console.log("wrapIndex: " + wrapIndex);
       console.log("find-fish in wrap");
       checkFishCandy({indexArr: [arr[i]], board, setScore})
       continue
-    }else if(arr[i] !== wrapIndex && board[arr[i]].type === "wrapped"){
+    }else if(arr[i] !== wrapIndex && board[arr[i]].type === "wrapped" &&
+      (wrappedIndex === null || (wrappedIndex !== null && arr[i] !== wrappedIndex))
+    ){
       console.log("find-wrapped in wrap");
-      checkWrappedCandy({indexArr: [arr[i]], board, setScore, strippedIndex: null})
+      checkWrappedCandy({indexArr: [arr[i]], board, setScore, wrappedIndex: wrapIndex})
       continue
     }else if(board[i].src !== blank){
       setScore(prev => prev + 60)
